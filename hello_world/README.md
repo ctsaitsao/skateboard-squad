@@ -1,4 +1,4 @@
-# Tiva_Make
+# Tiva Make
 Makefile for Texas Instruments' Tiva-C microcontroller
 
 ## Description
