@@ -49,7 +49,7 @@ For Tiva code, each `Makefile` must be edited to fit a user's computer. See [Tiv
 
 All MATLAB codes have options for all three three tricks but will only run the specified one correctly (correct gains, will plot for the specified trick).
 
-See instructions on how to run simulations in the [simulation README].
+See instructions on how to run simulations in the [simulation README](simulation/README.md).
 
 ## Folder Descriptions
 - `accelerometer`: Pololu LSM303D accelerometer data retrieval.
