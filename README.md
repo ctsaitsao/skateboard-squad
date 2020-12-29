@@ -14,15 +14,15 @@ The goal of this project was to build a skateboarding robot that could accomplis
 The three tricks that the robot performs are:
 1. Dropping-in: a trick with which a skateboarder starts skating a half-pipe by dropping into it from the coping instead of starting from the bottom. For the robot, this meant moving the horizontal component of the COM from outside the half-pipe to past the coping.
 
-   ![](media/person_drop_in.gif)
+   <img src="media/person_drop_in.gif" width="550">
 
 2. Pumping: a technique used to accelerate without the rider's feet leaving the board. For the robot, this meant rapidly moving the vertical component of the COM down when accelerating down the half-pipe and up when decelerating up it. This was definitely the hardest trick to perform, as it required the robot to have considerable top mass and motor power to achieve this high acceleration.
 
-   ![](media/person_pumping.gif)
+   <img src="media/person_pumping.gif" width="550">
 
 3. The "manual": essentially is a skateboarding wheelie. For the robot, this meant controlling the horizontal component of the COM to be directly above the hind wheel of the skateboard. We used LQR control.
 
-   ![](media/person_manual.gif)
+   <img src="media/person_manual.gif" width="550">
 
 ## Mechanical Design
 Much of Winter 2020 was spent designing the mechanical components of the robot. The overall design resembled an inverted double pendulum, and provided a superior ability to control the robot's center of mass when compared to designs that used linear or decoupled rotational actuators. Most of the robot's weight was concentrated at the top (the pendulum bob) in order to provide the necessary momentum to perform the tricks when manipulated. Fittingly, the robot was nicknamed "Thora" due to its likeness to Thor's hammer.
