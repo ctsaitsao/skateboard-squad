@@ -36,13 +36,13 @@ Much of Winter 2020 was spent designing the mechanical components of the robot. 
 Even though the real-life robot could not be used after the pandemic hit, its mechanical properties were used to model a dynamic system in MATLAB and simulate the tricks. See the [simulation README](simulation/README.md) for a more in-depth look at the code.
 1. Dropping-in:
    <br>
-   <img src="media/drop_in.gif" width="400">
+   <img src="media/drop_in.gif" width="450">
 2. Pumping:
    <br>
-   <img src="media/pumping.gif" width="400">
+   <img src="media/pumping.gif" width="450">
 3. Manual:
    <br>
-   <img src="media/manual.gif" width="400">
+   <img src="media/manual.gif" width="450">
    
 ## Usage
 Since each member of the team has different Makefiles, different folders contain code that only works on a specific computer. This is why each folder name contains a name of a team member.
