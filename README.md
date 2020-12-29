@@ -45,20 +45,18 @@ Even though the real-life robot could not be used after the pandemic hit, its me
    <img src="media/manual.gif" width="450">
    
 ## Usage
-Since each member of the team has different Makefiles, different folders contain code that only works on a specific computer. This is why each folder name contains a name of a team member.
+For Tiva code, each `Makefile` must be edited to fit a user's computer. See [Tiva make README](hello_world/README.md) for instructions on how to compile code.
 
-## Folders
-* BNO_drivers - Bosch Sensortec BNO055 sensor driver library
-* IMU_sparkfun - Streams data from SparkFun IMU (LSM9DS1)
-* PID_controller_on_tiva -
-* accelerometer - Accelerometer data retrieval
-* encoder - Communication between encoder and Tiva
-* hello_world - Multiple hello_worlds created by different team members
-* hello_world_linux - hello_world for linux
-* simulation - MATLAB code that runs a simulations of the skateboard robot
-* tiva_roboteq - tiva-roboteq interface
-* RDS_Skateboard_Matlab - MATLAB code for pumping and idle
-* (insert name here) - MATLAB code for dropping in
-* (insert name here) - MATLAB code for manual
+All MATLAB codes have options for all three three tricks but will only run the specified one correctly (correct gains, will plot for the specified trick).
 
-All the MATLAB codes for tricks have options for the three tricks but will only run the specified one correctly (correct gains, will plot for the specified trick)
+See instructions on how to run simulations in the [simulation README].
+
+## Folder Descriptions
+- `accelerometer`: Pololu LSM303D accelerometer data retrieval.
+- `bno_drivers`: Bosch Sensortec BNO055 sensor driver library.
+- `encoder`: communication between CUI AMT11 encoder and Tiva.
+- `hello_world`: tests Tiva communication. Includes the [Tiva make README](hello_world/README.md).
+- `imu_sparkfun`: streams data from SparkFun IMU (LSM9DS1).
+- `pid_controller_on_tiva`: simulating PID control of a rotary mass-spring-damper system using Simulink and Tiva microcontroller.
+- `simulation`: MATLAB code that runs a simulations of the skateboard robot. Includes the [simulation README](simulation/README.md)
+- `tiva_roboteq`: code that interfaces between the Tiva microcontroller and Roboteq controller for position commands.
