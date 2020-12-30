@@ -24,13 +24,20 @@ The three tricks that the robot performs are:
 
    <img src="media/person_manual.gif" width="500">
 
-## Mechanical Design
-Much of Winter 2020 was spent designing the mechanical components of the robot. The overall design resembled an inverted double pendulum, and provided a superior ability to control the robot's center of mass when compared to designs that used linear or decoupled rotational actuators. Most of the robot's weight was concentrated at the top (the pendulum bob) in order to provide the necessary momentum to perform the tricks when manipulated. Fittingly, the robot was nicknamed "Thora" due to its likeness to Thor's hammer.
+## Mechanical Design (pre-COVID)
+Much of Winter 2020 was spent designing the mechanical components of the robot. The overall design resembled an inverted double pendulum, and provided a superior ability to control the robot's center of mass when compared to designs that used linear or decoupled rotational actuators. Most of the robot's weight was concentrated at the top (the pendulum bob) in order to provide the necessary momentum to perform the tricks when manipulated. This weight came from two powerful motors and two motor controllers. Fittingly, the robot was nicknamed "Thora" due to its likeness to Thor's hammer.
 
 <img src="media/robot_irl.jpg" height="400"> <img src="media/robot_cad.jpg" height="400">
 
-## Electronics
+## Electronics (pre-COVID)
+### Microcontroller
+The Tiva TM4C123GH6PM Microcontroller formed the brains of the real-life robot. It offers a 80 MHz Cortex-M with FPU, a variety of integrated memories, and multiple programmable GPIO. The plan for the real-life robot was for the Tiva to communicate with sensors and motor controllers, issuing commands for the different states of the skateboarding operation.
+![](media/tiva.png)
 
+### Sensors
+An IMU (inertial measurement unit) would provide the robot with speed, acceleration, and orientation information. This information was necessary to detect the robot's position in the ramp for pumping as well as its tilt for the manual. Multiple IMU options were considered, but the Bosch ... was selected for its ...
+
+### Motors
 
 ## Simulation and Trick Demos
 Even though the real-life robot could not be used after the pandemic hit, its mechanical properties were used to model a dynamic system in MATLAB and simulate the tricks. See the [simulation README](simulation/README.md) for a more in-depth look at the code.
