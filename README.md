@@ -40,7 +40,7 @@ Two Maxon EC 60 flat Ø60 mm brushless motors would be used to actuate the two d
 
 <img src="media/motor.png" width="300">
 
-Two Roboteq MBL1660 brushless DC motor controllers would be use to control the powerful motors. They provide numerous advanced control modes — which include torque and speed control — but its position control modes (Closed Loop Position Relative, Closed Loop Count Position, Closed Loop Position Tracking) would've been used for this project.
+Two Roboteq MBL1660 brushless DC motor controllers would be use to control the powerful motors. They provide numerous advanced control modes — which include torque and speed control — but its position control modes (Closed Loop Position Relative, Closed Loop Count Position, Closed Loop Position Tracking) would've been used for this project. The `tiva_roboteq` folder contains code for communicating between the Tiva and the two Roboteqs.
 
 <img src="media/roboteq.png" width="400">
 
