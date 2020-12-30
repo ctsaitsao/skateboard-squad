@@ -28,7 +28,7 @@ end
 
 %% Initialize parameters
 
-params = initial_params;
+params = init_params;
 params.sim.stage = stage_input;
 global t_rd
 global prevTime_rd
@@ -60,7 +60,7 @@ t_rd = 0;
 prevTime_rd = 0;
 prevDirection = 1;
 
-% initialize the trick from the initial_params for motor control
+% initialize the trick from the initial params for motor control
 
 trick = params.sim.trick;
 

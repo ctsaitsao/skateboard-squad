@@ -1,4 +1,4 @@
-%% initial_params.m
+%% init_params.m
 %
 % Description:
 %   Initializes the values of many parameters, such as parameters in the
@@ -12,7 +12,7 @@
 %   params: a struct with many elements
 
 
-function params = initial_params
+function params = init_params
 
 % Skateboard Parameters
 
