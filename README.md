@@ -37,12 +37,12 @@ The Tiva TM4C123GH6PM Microcontroller formed the brains of the real-life robot. 
 
 ### Motors and Motor Controllers
 Two Maxon EC 60 flat Ø60 mm brushless motors would be used to actuate the two degrees of freedom of the robot. These motors had a max power of 200 W and were equipped with hall sensors. They could provide the 4.05 Nm max torque (after a 4:1 gearing ratio) and take in the ~60 A max current required for the pumping operation. See the `motor_analysis` folder for torque and speed calculations.
-<br>
-<img src="media/motor.png" width="500">
+
+<img src="media/motor.png" width="300">
 
 Two Roboteq MBL1660 brushless DC motor controllers would be use to control the powerful motors. They provide numerous advanced control modes — which include torque and speed control — but its position control modes (Closed Loop Position Relative, Closed Loop Count Position, Closed Loop Position Tracking) would've been used for this project.
 <br>
-<img src="media/roboteq.png" width="500">
+<img src="media/roboteq.png" width="400">
 
 ### Sensors
 An IMU (inertial measurement unit) would provide the robot with speed, acceleration, and orientation information. This information was necessary to detect the robot's position in the ramp during pumping and its tilt during the manual, among other reasons. Two IMU options were considered — the STMicroelectronics LSM9DS1 (in a Sparkfun board) and the Bosch BNO055 (in a Pololu board). 
