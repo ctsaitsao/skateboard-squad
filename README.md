@@ -41,22 +41,22 @@ Two Maxon EC 60 flat Ø60 mm brushless motors would be used to actuate the two d
 <img src="media/motor.png" width="300">
 
 Two Roboteq MBL1660 brushless DC motor controllers would be use to control the powerful motors. They provide numerous advanced control modes — which include torque and speed control — but its position control modes (Closed Loop Position Relative, Closed Loop Count Position, Closed Loop Position Tracking) would've been used for this project.
-<br>
+
 <img src="media/roboteq.png" width="400">
 
 ### Sensors
 An IMU (inertial measurement unit) would provide the robot with speed, acceleration, and orientation information. This information was necessary to detect the robot's position in the ramp during pumping and its tilt during the manual, among other reasons. Two IMU options were considered — the STMicroelectronics LSM9DS1 (in a Sparkfun board) and the Bosch BNO055 (in a Pololu board). 
 
 The ST IMU was implemented first. Code that reads IMU data from the Sparkfun board into the Tiva using I2C commucation can be found in the `imu_sparkfun` folder.
-<br>
+
 <img src="media/st_imu.jpg" width="200">
 
 The Bosch IMU was later selected to replace the ST IMU due to its superior sensor fusion, but its implementation fell short as the pandemic hit. Bosch drivers can be found in the `bno_drivers` folder.
-<br>
+
 <img src="media/bosch_imu.png" width="200">
 
 A CUI AMT11 incremental encoder was attached to each motor shaft and would provide information to the corresponding Roboteq controller for position control. The encoders could also provide this information to the Tiva (and code for this can be found in the `encoder` folder) but this was deemed unnecessary as the Roboteq would be in charge of the entire position control loop.
-<br>
+
 <img src="media/encoder.png" width="300">
 
 ## Simulation and Trick Demos (post-COVID)
