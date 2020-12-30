@@ -225,7 +225,7 @@ H_constR_flat = hessian(constR_flat, q);
 
 
 matlabFunction(leftWheelDFK,rightWheelDFK,'File','autogen_wheel_velocities');
-matlabFunction(bottomLinkDXCoM, bottomLinkDYCoM, topLinkDXCoM, topLinkDYCoM, 'File', 'autogen_CoM_velocities');
+matlabFunction(bottomLinkDXCoM, bottomLinkDYCoM, topLinkDXCoM, topLinkDYCoM, 'File', 'autogen_com_velocities');
 matlabFunction(A_all_ramp, H_constL_ramp, H_constR_ramp, 'File', 'autogen_constraint_derivatives_ramp');
 matlabFunction(A_all_flat, H_constL_flat, H_constR_flat, 'File', 'autogen_constraint_derivatives_flat');
 

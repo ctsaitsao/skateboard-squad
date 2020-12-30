@@ -398,7 +398,7 @@ end
 
 % compute energy
 
-TE_now = totalEnergy(x, params);
+TE_now = total_energy(x, params);
 DX_Matrix = [DX_Matrix; x(6)]; % matrix keeping track of DX for skateboard
 DY_Matrix = [DY_Matrix; x(7)]; % matrix keeping track of DY for skateboard
 DTheta_Matrix = [DTheta_Matrix; x(8)]; % matrix keeping track of DTheta for skateboard

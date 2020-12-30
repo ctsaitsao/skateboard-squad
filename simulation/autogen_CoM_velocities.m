@@ -1,4 +1,4 @@
-function [bottomLinkDXCoM,bottomLinkDYCoM,topLinkDXCoM,topLinkDYCoM] = autogen_CoM_velocities(boardDX,boardDY,boardTheta,boardDTheta,boardHeight,bottomLinkRCoM,bottomLinkTheta,bottomLinkDTheta,bottomLinkHeight,topLinkRCoM,topLinkTheta,topLinkDTheta)
+function [bottomLinkDXCoM,bottomLinkDYCoM,topLinkDXCoM,topLinkDYCoM] = autogen_com_velocities(boardDX,boardDY,boardTheta,boardDTheta,boardHeight,bottomLinkRCoM,bottomLinkTheta,bottomLinkDTheta,bottomLinkHeight,topLinkRCoM,topLinkTheta,topLinkDTheta)
 %AUTOGEN_COM_VELOCITIES
 %    [BOTTOMLINKDXCOM,BOTTOMLINKDYCOM,TOPLINKDXCOM,TOPLINKDYCOM] = AUTOGEN_COM_VELOCITIES(BOARDDX,BOARDDY,BOARDTHETA,BOARDDTHETA,BOARDHEIGHT,BOTTOMLINKRCOM,BOTTOMLINKTHETA,BOTTOMLINKDTHETA,BOTTOMLINKHEIGHT,TOPLINKRCOM,TOPLINKTHETA,TOPLINKDTHETA)
 
