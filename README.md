@@ -25,7 +25,7 @@ The three tricks that the robot performs are:
    <img src="media/person_manual.gif" width="500">
 
 ## Mechanical Design (pre-COVID)
-Much of Winter 2020 was spent designing the mechanical components of the robot. The overall design resembled an inverted double pendulum, and provided a superior ability to control the robot's center of mass when compared to designs that used linear or decoupled rotational actuators. Most of the robot's weight was concentrated at the top (the pendulum bob) in order to provide the necessary momentum to perform the tricks when manipulated. This weight came from two powerful motors (which rotated the two joints using belt drives) and two motor controllers. Fittingly, the robot was nicknamed "Thora" due to its likeness to Thor's hammer.
+Much of Winter 2020 was spent designing the mechanical components of the robot. The overall design had two revolute joints and resembled an inverted double pendulum, and provided a superior ability to control the robot's center of mass when compared to designs that used linear or decoupled rotational actuators. Most of the robot's weight was concentrated at the top (the pendulum bob) in order to provide the necessary momentum to perform the tricks when manipulated. This weight came from two powerful motors (which rotated the two joints using belt drives) and two motor controllers. Fittingly, the robot was nicknamed "Thora" due to its likeness to Thor's hammer.
 
 <img src="media/robot_irl.jpg" height="400"> <img src="media/robot_cad.jpg" height="400">
 
@@ -36,7 +36,13 @@ The Tiva TM4C123GH6PM Microcontroller formed the brains of the real-life robot. 
 <img src="media/tiva.png" width="500">
 
 ### Motors and Motor Controllers
+Two Maxon EC 60 flat Ø60 mm brushless motors would be used to actuate the two degrees of freedom of the robot. These motors had a max power of 200 W and were equipped with hall sensors. They could provide the 4.05 Nm max torque (after a 4:1 gearing ratio) and take in the ~60 A max current required for the pumping operation. See the `motor_analysis` folder for torque and speed calculations.
+<br>
+<img src="media/motor.png" width="500">
 
+Two Roboteq MBL1660 brushless DC motor controllers would be use to control the powerful motors. They provide numerous advanced control modes — which include torque and speed control — but its position control modes (Closed Loop Position Relative, Closed Loop Count Position, Closed Loop Position Tracking) would've been used for this project.
+<br>
+<img src="media/roboteq.png" width="500">
 
 ### Sensors
 An IMU (inertial measurement unit) would provide the robot with speed, acceleration, and orientation information. This information was necessary to detect the robot's position in the ramp during pumping and its tilt during the manual, among other reasons. Two IMU options were considered — the STMicroelectronics LSM9DS1 (in a Sparkfun board) and the Bosch BNO055 (in a Pololu board). 
@@ -78,6 +84,7 @@ See instructions on how to run simulations in the [simulation README](simulation
 - `encoder`: communication between CUI AMT11 encoder and Tiva.
 - `hello_world`: tests Tiva communication. Includes the [Tiva make README](hello_world/README.md).
 - `imu_sparkfun`: streams data from SparkFun IMU (LSM9DS1).
+- `motor_analysis`: MATLAB code for motor calculations.
 - `pid_controller_on_tiva`: simulating PID control of a rotary mass-spring-damper system using Simulink and Tiva microcontroller.
 - `simulation`: MATLAB code that runs a simulations of the skateboard robot. Includes the [simulation README](simulation/README.md)
 - `tiva_roboteq`: code that interfaces between the Tiva microcontroller and Roboteq controller for position commands.
