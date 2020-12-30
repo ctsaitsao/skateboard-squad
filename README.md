@@ -32,7 +32,7 @@ Much of Winter 2020 was spent designing the mechanical components of the robot. 
 ## Electronics (pre-COVID)
 ### Microcontroller
 The Tiva TM4C123GH6PM Microcontroller formed the brains of the real-life robot. It offers a 80 MHz Cortex-M with FPU, a variety of integrated memories, and multiple programmable GPIO. The plan for the real-life robot was for the Tiva to communicate with sensors and motor controllers, issuing commands for the different states of the skateboarding operation. The `tiva_roboteq` folder contains code for communication between the Tiva and the two Roboteq controllers.
-<br>
+
 <img src="media/tiva.png" width="500">
 
 ### Motors and Motor Controllers
@@ -62,13 +62,15 @@ A CUI AMT11 incremental encoder was attached to each motor shaft and would provi
 ## Simulation and Trick Demos (post-COVID)
 Even though the real-life robot could not be used after the pandemic hit, its mechanical properties were used to model a dynamic system in MATLAB and simulate the tricks. See the `simulation` folder for all the simulation code and the [simulation README](simulation/README.md) for a more in-depth look at how each trick was performed.
 1. Dropping-in:
-   <br>
+
    <img src="media/drop_in.gif" width="450">
+   
 2. Pumping: 
-   <br>
+
    <img src="media/pumping.gif" width="450">
+   
 3. Manual:
-   <br>
+
    <img src="media/manual.gif" width="450">
    
 ## Usage
