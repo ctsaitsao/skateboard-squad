@@ -32,7 +32,8 @@ Much of Winter 2020 was spent designing the mechanical components of the robot. 
 ## Electronics (pre-COVID)
 ### Microcontroller
 The Tiva TM4C123GH6PM Microcontroller formed the brains of the real-life robot. It offers a 80 MHz Cortex-M with FPU, a variety of integrated memories, and multiple programmable GPIO. The plan for the real-life robot was for the Tiva to communicate with sensors and motor controllers, issuing commands for the different states of the skateboarding operation. The `tiva_roboteq` folder contains code for communication between the Tiva and the two Roboteq controllers.
-![](media/tiva.png)
+<br>
+<img src="media/tiva.png" width="500">
 
 ### Motors and Motor Controllers
 
@@ -42,11 +43,11 @@ An IMU (inertial measurement unit) would provide the robot with speed, accelerat
 
 The ST IMU was implemented first. Code that reads IMU data from the Sparkfun board into the Tiva using I2C commucation can be found in the `imu_sparkfun` folder.
 <br>
-<img src="media/st_imu.jpg" width="300">
+<img src="media/st_imu.jpg" width="200">
 
 The Bosch IMU was later selected to replace the ST IMU due to its superior sensor fusion, but its implementation fell short as the pandemic hit. Bosch drivers can be found in the `bno_drivers` folder.
 <br>
-<img src="media/bosch_imu.png" width="300">
+<img src="media/bosch_imu.png" width="200">
 
 A CUI AMT11 incremental encoder was attached to each motor shaft and would provide information to the corresponding Roboteq controller for position control. The encoders could also provide this information to the Tiva (and code for this can be found in the `encoder` folder) but this was deemed unnecessary as the Roboteq would be in charge of the entire position control loop.
 <br>
