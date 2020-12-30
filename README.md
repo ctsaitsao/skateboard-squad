@@ -25,26 +25,39 @@ The three tricks that the robot performs are:
    <img src="media/person_manual.gif" width="500">
 
 ## Mechanical Design (pre-COVID)
-Much of Winter 2020 was spent designing the mechanical components of the robot. The overall design resembled an inverted double pendulum, and provided a superior ability to control the robot's center of mass when compared to designs that used linear or decoupled rotational actuators. Most of the robot's weight was concentrated at the top (the pendulum bob) in order to provide the necessary momentum to perform the tricks when manipulated. This weight came from two powerful motors and two motor controllers. Fittingly, the robot was nicknamed "Thora" due to its likeness to Thor's hammer.
+Much of Winter 2020 was spent designing the mechanical components of the robot. The overall design resembled an inverted double pendulum, and provided a superior ability to control the robot's center of mass when compared to designs that used linear or decoupled rotational actuators. Most of the robot's weight was concentrated at the top (the pendulum bob) in order to provide the necessary momentum to perform the tricks when manipulated. This weight came from two powerful motors (which rotated the two joints using belt drives) and two motor controllers. Fittingly, the robot was nicknamed "Thora" due to its likeness to Thor's hammer.
 
 <img src="media/robot_irl.jpg" height="400"> <img src="media/robot_cad.jpg" height="400">
 
 ## Electronics (pre-COVID)
 ### Microcontroller
-The Tiva TM4C123GH6PM Microcontroller formed the brains of the real-life robot. It offers a 80 MHz Cortex-M with FPU, a variety of integrated memories, and multiple programmable GPIO. The plan for the real-life robot was for the Tiva to communicate with sensors and motor controllers, issuing commands for the different states of the skateboarding operation.
+The Tiva TM4C123GH6PM Microcontroller formed the brains of the real-life robot. It offers a 80 MHz Cortex-M with FPU, a variety of integrated memories, and multiple programmable GPIO. The plan for the real-life robot was for the Tiva to communicate with sensors and motor controllers, issuing commands for the different states of the skateboarding operation. The `tiva_roboteq` folder contains code for communication between the Tiva and the two Roboteq controllers.
 ![](media/tiva.png)
 
+### Motors and Motor Controllers
+
+
 ### Sensors
-An IMU (inertial measurement unit) would provide the robot with speed, acceleration, and orientation information. This information was necessary to detect the robot's position in the ramp for pumping as well as its tilt for the manual. Multiple IMU options were considered, but the Bosch ... was selected for its ...
+An IMU (inertial measurement unit) would provide the robot with speed, acceleration, and orientation information. This information was necessary to detect the robot's position in the ramp during pumping and its tilt during the manual, among other reasons. Two IMU options were considered — the STMicroelectronics LSM9DS1 (in a Sparkfun board) and the Bosch BNO055 (in a Pololu board). 
 
-### Motors
+The ST IMU was implemented first. Code that reads IMU data from the Sparkfun board into the Tiva using I2C commucation can be found in the `imu_sparkfun` folder.
+<br>
+<img src="media/st_imu.jpg" width="300">
 
-## Simulation and Trick Demos
-Even though the real-life robot could not be used after the pandemic hit, its mechanical properties were used to model a dynamic system in MATLAB and simulate the tricks. See the [simulation README](simulation/README.md) for a more in-depth look at the code.
+The Bosch IMU was later selected to replace the ST IMU due to its superior sensor fusion, but its implementation fell short as the pandemic hit. Bosch drivers can be found in the `bno_drivers` folder.
+<br>
+<img src="media/bosch_imu.png" width="300">
+
+A CUI AMT11 incremental encoder was attached to each motor shaft and would provide information to the corresponding Roboteq controller for position control. The encoders could also provide this information to the Tiva (and code for this can be found in the `encoder` folder) but this was deemed unnecessary as the Roboteq would be in charge of the entire position control loop.
+<br>
+<img src="media/encoder.png" width="300">
+
+## Simulation and Trick Demos (post-COVID)
+Even though the real-life robot could not be used after the pandemic hit, its mechanical properties were used to model a dynamic system in MATLAB and simulate the tricks. See the `simulation` folder for all the simulation code and the [simulation README](simulation/README.md) for a more in-depth look at how each trick was performed.
 1. Dropping-in:
    <br>
    <img src="media/drop_in.gif" width="450">
-2. Pumping:
+2. Pumping: 
    <br>
    <img src="media/pumping.gif" width="450">
 3. Manual:
