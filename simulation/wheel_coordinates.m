@@ -2,7 +2,7 @@
 %
 % Description:
 %   Wrapper function for autogen_fk_wheels.m
-%   Computes the locations of the left and right feet of the jumping robot.
+%   Computes the locations of the wheels of the skateboard.
 %
 % Inputs:
 %   x: the state vector, x = [q; q_dot; s];

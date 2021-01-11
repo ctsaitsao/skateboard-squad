@@ -2,7 +2,7 @@
 %
 % Description:
 %   Wrapper function for autogen_foot_velocities.m
-%   Computes the velocities of the left and right feet of the jumping robot.
+%   Computes the velocities of the wheels of the skateboard.
 %
 % Inputs:
 %   x: the state vector, x = [q; q_dot; s];

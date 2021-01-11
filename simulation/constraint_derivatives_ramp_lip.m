@@ -2,7 +2,7 @@
 %
 % Description:
 %   Wrapper function for autogen_constraint_derivatives.m
-%   Computes the constraint jacobian and hessians for the jumping robot
+%   Computes the constraint jacobian and hessians for the robot
 %   on the ramp's lip.
 %
 % Inputs:
