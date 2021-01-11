@@ -1,21 +1,25 @@
 # Skateboard Simulation
 
-## Overview
-- States (`q`):
-  - `boardX`
-  - `boardY`
-  - `boardTheta`
-  - `bottomLinkTheta`
-  - `topLinkTheta`
-- Derivatives of states (`dq`):
-  - `boardDX`
-  - `boardDY`
-  - `boardDTheta`
-  - `bottomLinkDTheta`
-  - `topLinkDTheta`
-- Controls:
-  - `bottomMotorTorque`
-  - `topLinkTorque`
+## States
+The robot is modeled using five degrees of freedom. The states vector `q` contains `boardX`, `boardY`, `boardTheta`, `bottomLinkTheta`, and `topLinkTheta`. The state derivatives vector (`dq`) contains, `boardDX`, `boardDY`, `boardDTheta`, `bottomLinkDTheta`, and `topLinkDTheta`. These states are used to calculate the forward kinematics of the robot (see `derive_equations.mlx` for the equations).
+![](media/states.png)
+
+## Stages and Constraints
+There are two stages that the simulated robot can exist in — flat and ramp. The drop-in and pumping tricks are performed in the ramp stage and the manual trick is performed in the flat stage.
+
+Each stage is accompanied by constraint equations, which are equations that constrain the robot's motion along the surface (ground) of each stage. For the flat surface, the constraints are unilateral in the Y direction. In the ramp, the constraints are be unilateral in the direction normal to the ramp. See `derive_equations.mlx` for equations.
+
+![](media/flat_constraints.png)
+
+![](media/ramp_constraints.png)
+
+## Derivatives and Energy
+Calculating time derivatives of the kinematics equations of the robot is necessary for calculating the kinetic and potential energy for the robot. Energy conservation is a key part of simulating the dynamics and motion of the robot. See `derive_equations.mlx` for derivative and energy calculations.
+
+## Controls
+The robot contains two actuated degrees of freedom, `bottomLinkTheta` and `topLinkTheta`. This actuation comes from the two motors of the inverted double pendulum design. Thus, the two control variables are `bottomMotorTorque` and `topLinkTorque`. 
+
+
 
 
 ## Usage
