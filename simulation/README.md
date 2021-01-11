@@ -22,7 +22,7 @@ Ramp:
 Calculating time derivatives of the kinematics equations of the robot is necessary for calculating the kinetic and potential energy for the robot. Energy conservation is a key part of simulating the dynamics and motion of the robot. See `derive_equations.mlx` for derivative and energy calculations.
 
 ## Trick Controls
-The robot contains two actuated degrees of freedom, `bottomLinkTheta` and `topLinkTheta`. This actuation comes from the two motors of the inverted double pendulum design. Thus, the two control variables are `bottomMotorTorque` and `topLinkTorque`. 
+The robot contains two actuated degrees of freedom, `bottomLinkTheta` and `topLinkTheta`. This actuation comes from the two motors of the inverted double pendulum design. Thus, the two control variables are `bottomMotorTorque` and `topLinkTorque`. See the files `main.m`, `pid_idle.m`, `pid_pumping.m`, and `lqr_manual.m` for calculations.
 
 ### Pumping
 The pumping trick controls the center of mass of the robot through PID control. Its end goal is to accelerate the robot after the drop-in.  Controls can be described using the following table:
