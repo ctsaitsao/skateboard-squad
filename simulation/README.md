@@ -1,13 +1,13 @@
 # Skateboard Simulation
 
 ## Overview
-- States, `q`:
+- States (`q`):
   - `boardX`
   - `boardY`
   - `boardTheta`
   - `bottomLinkTheta`
   - `topLinkTheta`
-- Derivatives, `dq`:
+- Derivatives of states (`dq`):
   - `boardDX`
   - `boardDY`
   - `boardDTheta`
