@@ -383,7 +383,7 @@ Q = [0; 0; 0; bottomMotorTorque; topMotorTorque];
 %%
 
 % find the parts that don't depend on constraint forces
-H = H_eom(x,params);
+H = h_eom(x,params);
 Minv = inv_mass_matrix(x,params);
 
 switch stage

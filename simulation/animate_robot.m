@@ -88,7 +88,7 @@ if tracing
 end
 
 if p.Results.video
-        v = VideoWriter('skateboard.avi');
+        v = VideoWriter('output.avi');
         open(v);
 end
     
