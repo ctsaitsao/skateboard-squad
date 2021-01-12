@@ -1,4 +1,5 @@
 # Skateboarding Robot Project
+### Authors: Juan Solera, Christopher Tsai, Jenny Kim, Michael Doody, Qiyan Chen, Jacob Beran
 Senior capstone project for ME 495: Robot Design Studio, Northwestern University, Winter and Spring 2020.
 
 ## Overview
