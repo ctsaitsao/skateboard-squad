@@ -1,8 +1,8 @@
-%% constraints_flat.m
+%% constraints.m
 %
 % Description:
-%   Wrapper function for autogen_constraints_flat.m
-%   Computes the constraint forces of the robot in the flat stage.
+%   Wrapper function for autogen_constraints.m
+%   Computes the constraint forces of the robot.
 %
 % Inputs:
 %   x: the state vector, x = [q; q_dot];

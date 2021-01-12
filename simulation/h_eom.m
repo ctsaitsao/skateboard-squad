@@ -1,8 +1,8 @@
-%% h_eom.m
+%% H_eom.m
 %
 % Description:
-%   Wrapper function for autogen_h_eom.m
-%   Computes H(q,q_dot) for the robot.
+%   Wrapper function for autogen_H.m
+%   Computes H(q,q_dot) for the jumping robot.
 %
 % Inputs:
 %   x: the state vector, x = [q; q_dot];
@@ -11,7 +11,7 @@
 % Outputs:
 %   H: a 5x1 set of terms.
 
-function H = h_eom(x,params)
+function H = H_eom(x,params)
 
 
 % autogen inputs;
@@ -19,7 +19,7 @@ function H = h_eom(x,params)
 % bottomLinkRCoM,bottomLinkMass,bottomLinkTheta,bottomLinkDTheta,bottomLinkHeight,g,
 % topLinkRCoM,topLinkMass,topLinkTheta,topLinkDTheta)
 
-H = autogen_h_eom(params.boardMass, x(3), x(8), params.boardHeight,...
+H = autogen_H_eom(params.boardMass, x(3), x(8), params.boardHeight,...
                   params.bottomLinkYCoM, params.bottomLinkMass,...
                   x(4), x(9), params.bottomLinkHeight, params.g,...
                   params.topLinkYCoM, params.topLinkMass, x(5), x(10));

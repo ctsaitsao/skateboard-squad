@@ -1,8 +1,8 @@
-%% constraints_ramp.m
+%% constraints.m
 %
 % Description:
-%   Wrapper function for autogen_constraints_ramp.m
-%   Computes the constraint forces of the robot in the ramp stage.
+%   Wrapper function for autogen_constraints.m
+%   Computes the constraint forces of the robot.
 %
 % Inputs:
 %   x: the state vector, x = [q; q_dot];
@@ -12,8 +12,6 @@
 %   C_all = values of two constraint equations
 
 function [C_all] = constraints_ramp(x,params)
-
-[r_l,r_r] = wheel_coordinates(x,params);
 
 [p_l,~,n_l] = track(x(11),params);
 [p_r,~,n_r] = track(x(12),params);
@@ -32,19 +30,10 @@ normRightY = n_r(2);
 % normLeftX,normLeftY,normRightX,normRightY,
 % pLeftX,pLeftY,pRightX,pRightY,wheelRadius
 
-if x(1) - params.boardLength/2 <= -2 
-    
-C_all = autogen_constraints_ramp_lip(x(2), x(3), params.boardHeight,...
-                                 params.boardLength, params.wheelRadius);
-
-else
-    
 C_all = autogen_constraints_ramp(x(1), x(2), x(3), params.boardHeight,...
                             params.boardLength, normLeftX, normLeftY,...
                             normRightX, normRightY, pLeftX, pLeftY,...
                             pRightX, pRightY, params.wheelRadius);
-                        
-end
 
 end
 

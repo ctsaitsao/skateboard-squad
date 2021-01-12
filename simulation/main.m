@@ -16,9 +16,6 @@ clc;
 
 init_env();
 
-
-% prompt user for the stage (two options: flat or ramp)
-
 stage_input = input('Enter stage: \n', 's');
 
 while (~strcmp(stage_input, "ramp") && ~strcmp(stage_input, "flat"))
@@ -28,95 +25,67 @@ end
 
 %% Initialize parameters
 
-params = init_params;
+params = initial_params;
 params.sim.stage = stage_input;
-global t_rd
-global prevTime_rd
-global prevDirection
-global i
-global prevBottomErrorIdle
-global prevTopErrorIdle
-global prevBottomErrorPumping
-global prevTopErrorPumping
-%% Set up events using odeset
-
-options = odeset('Events',@robot_events);
-
-%% Visualize the robot in its initial state
-
-% first five elements are configs (boardX boardY boardTheta bottomLinkTheta topLinkTheta
-% last five are velocities corresponding
-
-% initialize global variables, in future code, these should be kept track
-% with the TIVA microcontroller as they are part of the feedback control
-% for different tricks
-
 events = [];
-prevBottomErrorIdle = 0;
-prevTopErrorIdle = 0;
-prevBottomErrorPumping = 0;
-prevTopErrorPumping = 0;
-t_rd = 0;
-prevTime_rd = 0;
-prevDirection = 1;
-
-% initialize the trick from the initial params for motor control
-
 trick = params.sim.trick;
 
-% initialize initial conditions
+%% Set max time step using odeset
+options = odeset('MaxStep',params.sim.dt);
 
-boardX_init = params.boardX_init;
-boardY_init = params.boardY_init;
-boardTheta_init = params.boardTheta_init;
-bottomLinkTheta_init = params.bottomLinkTheta_init;
-topLinkTheta_init = params.topLinkTheta_init;
-boardDX_init = params.boardDX_init; 
-boardDY_init = params.boardDY_init;
-boardDTheta_init = params.boardDTheta_init;
-bottomLinkDTheta_init = params.bottomLinkDTheta_init;
-topLinkDTheta_init = params.topLinkDTheta_init;
+%% Set up events using odeset
+options = odeset('Events',@robot_events);
 
-stage = params.sim.stage;
+%% [FLAT CASE] Set the initial equilibrium pose of the robot 
+x_eq = zeros(10,1);  % [q, dq] = [boardX; boardY; boardTheta; bottomLinkTheta; topLinkTheta; boardDX; boardDY; boardDTheta; bottomLinkDTheta; topLinkDTheta];
+x_eq(3) = deg2rad(15);
+x_eq(4) = deg2rad(55);
+x_eq(5) = eq_top_link_angle(x_eq(3), x_eq(4), params);
 
-% initialize the trackers for the ramp
+%% [FLAT CASE] Show the robot in equilibrium
+x_eq_plot = x_eq(1:5);
 
 thetaRamp = asin((params.boardLength/2)/params.trackRadius);
 trackLeftS_init = -params.trackRadius*thetaRamp;
 trackRightS_init = params.trackRadius*thetaRamp;
+stage = params.sim.stage;
 
-    
-% initialize the array with the initial conditions for the robot's states
-
-x_IC = [boardX_init; boardY_init; boardTheta_init;...
-        bottomLinkTheta_init; topLinkTheta_init; ...
-        boardDX_init; boardDY_init; boardDTheta_init;...
-        bottomLinkDTheta_init; topLinkDTheta_init];
-       
-x_IC_plot = x_IC(1:5);
-
-% if the stage is ramp, we also need to keep track of the normal vectors to
-% the ramp
-      
 switch stage
     
     case 'ramp'
-    x_IC = [x_IC; trackLeftS_init; trackRightS_init];
-    x_IC_plot = [x_IC_plot; x_IC(11); x_IC(12)];
+    x_eq = [x_eq; trackLeftS_init; trackRightS_init];
+    x_eq_plot = [x_eq_plot; x_eq(11); x_eq(12)];
     
 end
 
-i = 0;
+plot_robot(x_eq_plot,params,'new_fig',false);
 
-% plot the robot with the initial conditions, make sure it works and we are
-% receiving what we expect
- 
-plot_robot(x_IC_plot, params,'new_fig',false);
+%% [FLAT CASE] Set equilibrium motor torques
 
+x_eq_3DOF = [x_eq(3);x_eq(4);x_eq(5);x_eq(8);x_eq(9);x_eq(10)];
+G = conservative_forces_3DOF(x_eq_3DOF,params)
+% fprintf('%.10f',G(1))
+u_eq = [G(2);G(3)];              % initial command
+% u_eq = reshape(eq_torques(x_eq(3),x_eq(4),x_eq(5),params),[2,1]);   % outputs same as u_eq = [G(2);G(3)]   
+u = u_eq;
 
+%% [FLAT CASE] Get 3DOF LQR gains
 
+[Gains, Poles] = lqr_gains(x_eq_3DOF,params)
 
-%% Simulate the robot forward in time     
+%% [FLAT CASE] initialize the state
+x_IC = x_eq;
+x_IC(6) = 30;  % initial velocity in x direction
+% perturb slightly so that something happens  CAN CHANGE TO SMTH ELSE
+% x_IC(3) = x_IC(3) + (1/5)*pi;
+
+%% [FLAT CASE] initialize controller memory
+memory.u_eq = u_eq;  % not really memory ... just passing the equilibrium 
+memory.x_eq = x_eq;  % not really memory ... just passing the equilibrium
+memory.y = [x_IC(4:5);x_IC(8)];  % y = stuff you can control 
+memory.boardTheta = x_IC(3);  % perfect initial knowledge!
+
+%% [FLAT CASE] Simulate the robot forward in time (main loop)
 
 % initial conditions
 tnow = 0.0;            
@@ -127,6 +96,7 @@ tnow = 0.0;
 tsim = [];
 xsim = [];
 F_list = [];
+usim = [];
 DX_Matrix = [];
 DY_Matrix = [];
 DTheta_Matrix = [];
@@ -136,100 +106,119 @@ TotEnergy = [];
 robotCoM_Matrix = [];
 T = [];
 
-
+tcontrol = [];
 
 % create a place for constraint forces
 F = [];
+dt = params.sim.dt;
 
 while tnow < params.sim.tfinal
-
-    tspan = [tnow params.sim.tfinal];
     
-    
-    [tseg, xseg, ~, ~, ie] = ode45(@robot_dynamics, tspan, x_IC, options);
+%     tnow
 
+%     tspan = [tnow params.sim.tfinal];
+%     [tseg, xseg, ~, ~, ie] = ode45(@robot_dynamics, tspan, x_IC, options);
+
+    tspan = [tnow, tnow+dt];
+    [tseg, xseg] = ode45(@(t,x) robot_dynamics(t,x,u), tspan, x_IC);
+    
+    % find the state and sensor measurements at the time a read was made
+    t_read = tseg(end) - params.sim.delay;
+    x_read = interp1(tseg,xseg,t_read);
+    y = sensor(x_read);
+    
+    % compute the control 
+    [u,memory] = digital_controller(y,Gains,memory);
+    
+    % update t_write and x_IC for next iteration
+    tnow = tseg(end);
+    x_IC = xseg(end,:); 
+    
     % augment tsim and xsim; renew ICs
     tsim = [tsim;tseg];
     xsim = [xsim;xseg];
-    tnow = tsim(end);
-    x_IC = xsim(end,:);
+%     tnow = tsim(end);
+%     x_IC = xsim(end,:);
+    
+    % variables based off of tcontrol, not tsim
+    tcontrol = [tcontrol;t_read];
+    usim = [usim;u];
     
     % compute the constraint forces that were active during the jump
     Fseg = zeros(2,length(tseg));
     for ii=1:length(tseg)
-        [~,Fseg(:,ii)] = robot_dynamics(tseg(ii),xseg(ii,:)');
-         
+        [~,Fseg(:,ii)] = robot_dynamics(tseg(ii),xseg(ii,:)',u);
+%         [~,Fseg(:,ii)] = robot_dynamics(tseg(ii),xseg(ii,:)');         
     end
     
     F_list = [F_list,Fseg];
     
     
-    if tseg(end) < params.sim.tfinal  % termination was triggered by an event
-        [x_IC] = change_constraints(x_IC,ie);
-    end
+%     if tseg(end) < params.sim.tfinal  % termination was triggered by an event
+%         [x_IC] = change_constraints(x_IC,ie);
+%     end
     
     
-    
-   
 end
 
 %%  Plot Results %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Energy plots to make sure it's staying conserved
-figure;
-subplot(2,3,1)
-plot(T, DX_Matrix, 'r-', 'LineWidth', 2);
-ylabel('DX (m/s)');
-xlabel('time (sec)');
-subplot(2,3,2)
-plot(T, DY_Matrix, 'r-', 'LineWidth', 2);
-ylabel('DY (m/s)');
-xlabel('time (sec)');
-subplot(2,3,3)
-plot(T, DTheta_Matrix, 'r-', 'LineWidth', 2);
-ylabel('DTheta (rad/s)');
-xlabel('time (sec)');
-subplot(2,3,4)
-plot(T, DTheta_bottomlink_Matrix, 'r-', 'LineWidth', 2);
-ylabel('DTheta bottomLink (rad/s)');
-xlabel('time (sec)');
-subplot(2,3,5)
-plot(T, DTheta_toplink_Matrix, 'r-', 'LineWidth', 2);
-ylabel('DTheta topLink (rad/s)');
-xlabel('time (sec)');
-subplot(2,3,6)
-plot(T, TotEnergy, 'b-', 'LineWidth', 2);
-ylabel('Energy (J)');
-xlabel('time (sec)');
-hold off
+% % Energy plots to make sure it's staying conserved
+% figure;
+% subplot(2,3,1)
+% plot(T, DX_Matrix, 'r-', 'LineWidth', 2);
+% ylabel('DX (m/s)');
+% xlabel('time (sec)');
+% subplot(2,3,2)
+% plot(T, DY_Matrix, 'r-', 'LineWidth', 2);
+% ylabel('DY (m/s)');
+% xlabel('time (sec)');
+% subplot(2,3,3)
+% plot(T, DTheta_Matrix, 'r-', 'LineWidth', 2);
+% ylabel('DTheta (rad/s)');
+% xlabel('time (sec)');
+% subplot(2,3,4)
+% plot(T, DTheta_bottomlink_Matrix, 'r-', 'LineWidth', 2);
+% ylabel('DTheta bottomLink (rad/s)');
+% xlabel('time (sec)');
+% subplot(2,3,5)
+% plot(T, DTheta_toplink_Matrix, 'r-', 'LineWidth', 2);
+% ylabel('DTheta topLink (rad/s)');
+% xlabel('time (sec)');
+% subplot(2,3,6)
+% plot(T, TotEnergy, 'b-', 'LineWidth', 2);
+% ylabel('Energy (J)');
+% xlabel('time (sec)');
+% hold off
+% 
+% figure;
+% plot(robotCoM_Matrix(:,1), robotCoM_Matrix(:,2), 'b-', 'LineWidth', 2);
+% xlabel('robotCoM x');
+% ylabel('robotCoM y');
+% hold off
+% 
+% figure;
+% subplot(1,2,1)
+% plot(tsim, F_list(1,:), 'r-', 'LineWidth', 2);
+% ylabel('Left constraint (N)');
+% xlabel('time (sec)');
+% subplot(1,2,2)
+% plot(tsim, F_list(2,:), 'r-', 'LineWidth', 2);
+% ylabel('Right constraint (N)');
+% xlabel('time (sec)');
+% hold off
+% 
+% figure
+% plot(tsim, xsim(:,4), 'LineWidth', 2);
+% ylabel('Joint angle');
+% xlabel('time (sec)');
+% hold off
 
-% plot constraint forces against time
-
-figure;
-subplot(1,2,1)
-plot(tsim, F_list(1,:), 'r-', 'LineWidth', 2);
-ylabel('Left constraint (N)');
-xlabel('time (sec)');
-subplot(1,2,2)
-plot(tsim, F_list(2,:), 'r-', 'LineWidth', 2);
-ylabel('Right constraint (N)');
-xlabel('time (sec)');
-hold off
-
-% plot the angle positions for control purposes, see overshoot and
-% steady-state error
-
-figure
-subplot(2,1,1)
-plot(tsim, xsim(:,5), 'LineWidth', 2);
-ylabel('Top joint angle');
-xlabel('time (sec)');
-subplot(2,1,2)
-plot(tsim, xsim(:,4), 'LineWidth', 2);
-ylabel('Bottom joint angle');
-xlabel('time (sec)');
-hold off
-
-
+% plot joint angles
+% figure;
+% plot(tsim,xsim(:,3:5),'LineWidth',2);  
+% ylabel('Joint Angles')
+% xlabel('time (sec)')
+% legend({'boardTheta','bottomLinkTheta','topLinkTheta'});
 
 
 % Now let's animate
@@ -246,11 +235,11 @@ t_anim = 0:params.sim.dt:tsim(end);
 % 3) resample the state-vs-time array:
 x_anim = interp1(tsim,xsim,t_anim);
 x_anim = x_anim'; % transpose so that xsim is 10xN (N = number of timesteps)
-
+    
 % 4) resample the constraint forces-vs-time array:
 F_anim = interp1(tsim,F_list',t_anim);
 F_anim = F_anim';
-
+    
 switch stage
     
     case 'ramp'
@@ -261,12 +250,97 @@ end
 
 animate_robot(xAnim, F_anim, params,'trace_board_com',true,...
     'trace_bottomLink_com',true,'trace_topLink_com',true,'trace_robot_com',...
-     true,'show_constraint_forces',false,'video',true);
+     true,'show_constraint_forces',true,'video',true);
 fprintf('Done!\n');
 
 %% BELOW HERE ARE THE NESTED FUNCTIONS, ROBOT_DYNAMICS AND ROBOT_EVENTS
 
 %% THEY HAVE ACCESS TO ALL VARIABLES IN MAIN
+
+%% sensor.m %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Description:
+%   Computes the sensor values that are sent to the digital controller 
+%
+% Inputs:
+%   x_read: the 12x1 state vector at the time of a read (note that not all
+%   of the state is actually read ... we must determine the sensor readings
+%   from x_read)
+%   u: the control inputs (used here because we have to call
+%   robot_dynamics)
+%
+% Outputs:
+%   y: the sensor values
+
+function [y] = sensor(x_read)
+    
+    % NOTE:  right now, sensors are "perfect" -- no noise or quantization.
+    % That *should* be added!
+    y = zeros(3,1);
+    % assume encoders for bottom link angle and top link angle, could multiply x_read by something to simulate noise
+    y(1:2) = x_read(4:5);   % bottomLinkTheta and topLinkTheta
+    % assume IMU gyro for board angular velocity
+    y(3) = x_read(8);
+    
+end
+%% end of sensor.m %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% [FLAT CASE] digital_controller.m %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Description:
+%   Computes the torque commands to the two motors 
+%
+% Inputs:
+%   y: the 5x1 output vector at the time of a read 
+%   memory: a struct that holds stored variables
+%
+% Outputs:
+%   u: the two torque commands
+%   memory: a struct that holds stored variables
+
+function [u,memory] = digital_controller(y,Gains,memory)
+    
+    % estimate bottomLinkTheta and topLinkTheta by backwards difference
+    % differentiation
+    % NOTE: some low pass filtering should probably be added
+    bottomLinkThetaDot = (y(1) - memory.y(1))/params.sim.dt;
+    topLinkThetaDot = (y(2) - memory.y(2))/params.sim.dt;
+    
+    % estimate boardTheta from IMU readings
+    % two approaches:  1) integrate boardThetaDot;  2) use the measured
+    % accelerations and the knowledge of track shape to estimate it.  This
+    % approach depends on a model, but doesn't have the problem of drift
+    %
+    % Approach 1:  Integrate gyro
+    boardTheta = memory.boardTheta + y(3)*params.sim.dt;
+    
+    % package up the state estimate
+    x = [0;0;boardTheta;y(1);y(2);0;0;y(3);bottomLinkThetaDot;topLinkThetaDot];
+    
+    % compute the controls
+    error = x - memory.x_eq;
+    error_3DOF = [error(3);error(4);error(5);error(8);error(9);error(10)];
+    u = memory.u_eq - Gains*error_3DOF;
+    
+    % I've removed saturation to make it work.  If I put this back, things
+    % go haywire after a while.  Probably by increasing the gain a bit, we
+    % could bring this back.  For now, it might be better just to plot
+    % actuator torques
+    
+    % Saturate u (i.e., observe actuator limitations!)
+%     if abs(u(1)) > params.motor.spine.peaktorque
+%         u(1) = params.motor.spine.peaktorque*sign(u(1));
+%     end
+%     if abs(u(2)) > params.motor.body.peaktorque
+%         u(2) = params.motor.body.peaktorque*sign(u(2));
+%     end
+    
+    % Update memory (these are values that the Tiva would store)
+    memory.y = y;
+    memory.boardTheta = boardTheta;
+    
+end
+%% end of digital_controller.m %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% robot_dynamics.m %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -287,8 +361,30 @@ fprintf('Done!\n');
 %   dx: derivative of state x with respect to time.
 %   energy: total energy of the system at state x
 
-function [dx, F] = robot_dynamics(t,x)
-    
+% function [dx] = robot_dynamics(~,x,u)
+% 
+%     dx = zeros(numel(x),1);
+%     nq = 5;    
+%     % for convenience, define q_dot 
+%     q_dot = x(nq+1:2*nq);
+% 
+%     % set up generalized forces based on motor torques
+%     Q = [0;0;0;u];
+%     
+%     % compute M and H
+%     H = H_eom(x,params);
+%     M = mass_matrix(x,params); % NOTE: eliminated use of symbolic inverse mass matrix since it takes so long to compute
+% 
+%     dx(1:nq) = q_dot; 
+%     dx(nq+1:2*nq) = M\(Q - H);
+% 
+% end
+% 
+function [dx, F] = robot_dynamics(t,x,u)
+% function [dx, F] = robot_dynamics(t,x)
+
+
+% for convenience, define q_dot
 
 switch stage
     
@@ -313,83 +409,25 @@ end
 
 %% DECIDE WHAT Q IS  
 
-switch trick
-    
-    case 'pumping'
-        
- % for the pumping PID in the ramp, we need to control the direction of the robot
-% since it must crouch (direction == 0) at a high point in the ramp and it
-% must extent (direction == 1) when it is at the bottom of the ramp.
-
-% we do this by keeping track of the angular position and angular velocity
-% of the skateboard because this is what we would do in real life with the
-% IMU
-
-% the time delay of 0.1 is because of hysteresis, we want to give the robot
-% 0.1 seconds so that it can stabilize right after it changes direction.
-% can definitely be improved on
-
-if t_rd <= 0.1
-    direction = prevDirection;      
-elseif t_rd > 0.1
-    if x(3) > 0 && x(8) > 0
-        direction = 1;
-    elseif x(3) < 0 && x(8) < 0
-        direction = 1;
-    elseif x(3) > 0 && x(8) < 0
-        direction = 0;
-    else
-        direction = 0;
-    end
-    
-    if direction ~= prevDirection
-        t_rd = 0;
-        prevDirection = direction;
-    end  
-    
-end
-
-t_rd = t_rd + (t-prevTime_rd);
-prevTime_rd = t;
-
-% inputs for feedback control:  bottomLink Current Angle,
-% topLink Current Angle, direction
-   
-[bottomMotorTorque, topMotorTorque] = pid_pumping(x(4), x(5), direction);
-
-    case 'manual'
-        
-
-[bottomMotorTorque, topMotorTorque] = pid_manual(x(4), x(5));
-
-    case 'idle'
-        
-% inputs for feedback control:  bottomLink Current Angle,
-% topLink Current Angle, desired bottomLink Angle, desired topLink Angle
-        
-desiredTop = 0;
-desiredBottom = 0;
-        
-[bottomMotorTorque, topMotorTorque] = pid_idle(x(4), x(5), desiredBottom, desiredTop);
-
-
-end
-
-% build the array of torques after control
-
-Q = [0; 0; 0; bottomMotorTorque; topMotorTorque];
+% % inputs for feedback control: board Current Angle, bottomLink Current Angle,
+% % bottomLink Desired Angle, topLink Current Angle, topLink Desired Angle
+% 
+% [bottomMotorTorque, topMotorTorque] = pid_angle(x(3), x(4), 1.1, x(5), 0);
+%  
+% 
+% Q = [0; 0; 0; bottomMotorTorque; topMotorTorque];
+Q = [0;0;0;u];
 
 
 %%
 
 % find the parts that don't depend on constraint forces
-H = h_eom(x,params);
+H = H_eom(x,params);
 Minv = inv_mass_matrix(x,params);
 
 switch stage
     
     case 'ramp'
-        
         [A,Hessian] = constraint_derivatives_ramp(x,params);
         
     case 'flat'
@@ -398,7 +436,7 @@ end
 
 % compute energy
 
-TE_now = total_energy(x, params);
+TE_now = totalEnergy(x, params);
 DX_Matrix = [DX_Matrix; x(6)]; % matrix keeping track of DX for skateboard
 DY_Matrix = [DY_Matrix; x(7)]; % matrix keeping track of DY for skateboard
 DTheta_Matrix = [DTheta_Matrix; x(8)]; % matrix keeping track of DTheta for skateboard
@@ -558,6 +596,11 @@ end
 end
 %% end of change_constraints.m %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-%% End of main.m
+%% end of main.m
 end
+
+
+
+
+
+

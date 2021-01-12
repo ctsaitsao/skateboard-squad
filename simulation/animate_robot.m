@@ -61,7 +61,7 @@ addParameter(p, 'video', false);
 % Step 3: parse the inputs:
 parse(p, q_list, F_list, params, varargin{:});
 
-fig_handle = figure('Renderer', 'painters', 'Position', [10 10 974 974]);
+fig_handle = figure('Renderer', 'painters', 'Position', [10 10 900 600]);
 
 if (p.Results.trace_board_com || p.Results.trace_bottomLink_com ...
         || p.Results.trace_topLink_com || p.Results.trace_robot_com)
@@ -88,9 +88,12 @@ if tracing
 end
 
 if p.Results.video
-        v = VideoWriter('output.avi');
+        v = VideoWriter('skateboard.avi');
         open(v);
 end
+
+%     fig = figure();
+%     hold on;
     
     for i = 1:size(q_list,2)
         
@@ -99,24 +102,24 @@ end
         q = q_list(:,i); 
         F = F_list(:,i);
        
-        if tracing
-            FK = fwd_kin(q_list(:,i),params);
-
-            % append (x,y) location of cart CoM:
-            board.curr.com.x = [board.curr.com.x, FK(1,1)];
-            board.curr.com.y = [board.curr.com.y, FK(2,1)];
-
-            % append (x,y) location of pendulum CoM:
-            bottomLink.curr.com.x = [bottomLink.curr.com.x,FK(1,2)];
-            bottomLink.curr.com.y = [bottomLink.curr.com.y,FK(2,2)];
-
-            % append (x,y) location of pendulum tip:
-            topLink.curr.com.x = [topLink.curr.com.x,FK(1,3)];
-            topLink.curr.com.y = [topLink.curr.com.y,FK(2,3)];
-            
-            robot.curr.com.x = [robot.curr.com.x,FK(1,4)];
-            robot.curr.com.y = [robot.curr.com.y,FK(2,4)];
-            
+%         if tracing
+%             FK = fwd_kin(q_list(:,i),params);
+% 
+%             % append (x,y) location of cart CoM:
+%             board.curr.com.x = [board.curr.com.x, FK(1,1)];
+%             board.curr.com.y = [board.curr.com.y, FK(2,1)];
+% 
+%             % append (x,y) location of pendulum CoM:
+%             bottomLink.curr.com.x = [bottomLink.curr.com.x,FK(1,2)];
+%             bottomLink.curr.com.y = [bottomLink.curr.com.y,FK(2,2)];
+% 
+%             % append (x,y) location of pendulum tip:
+%             topLink.curr.com.x = [topLink.curr.com.x,FK(1,3)];
+%             topLink.curr.com.y = [topLink.curr.com.y,FK(2,3)];
+%             
+%             robot.curr.com.x = [robot.curr.com.x,FK(1,4)];
+%             robot.curr.com.y = [robot.curr.com.y,FK(2,4)];
+%             
 %             if p.Results.trace_board_com
 %                 hold on;
 %                 p1 = plot(board.curr.com.x,board.curr.com.y,'o-',...
@@ -144,68 +147,70 @@ end
 %                     'MarkerEdgeColor',params.viz.colors.topLinkCoM);
 %                 hold off;
 %             end
-             if p.Results.trace_robot_com
-                hold on;
-                p4 = plot(robot.curr.com.x,robot.curr.com.y,'o-',...
-                    'Color',params.viz.colors.robotCoM,...
-                    'MarkerSize',3,'LineWidth',2,...
-                    'MarkerFaceColor',params.viz.colors.robotCoM,...
-                    'MarkerEdgeColor',params.viz.colors.robotCoM);
-                hold off;
-            end
-            
+%             if p.Results.trace_robot_com
+%                 hold on;
+%                 p4 = plot(robot.curr.com.x,robot.curr.com.y,'o-',...
+%                     'Color',params.viz.colors.robotCoM,...
+%                     'MarkerSize',3,'LineWidth',2,...
+%                     'MarkerFaceColor',params.viz.colors.robotCoM,...
+%                     'MarkerEdgeColor',params.viz.colors.robotCoM);
+%                 hold off;
+%             end
+%             
 %         legend([p1 p2 p3 p4], 'board CoM', 'bottom Link CoM', 'top link CoM',...
 %         'aggregate CoM','Location', 'northeastoutside', ...
 %         'FontSize',10);
-            
-        end
+%             
+%         end
         
-        if p.Results.show_constraint_forces
-                
-        T_wheels =   [cos(q(3)), -sin(q(3)), q(1);
-                     sin(q(3)),  cos(q(3)), q(2);
-                     0,          0,         1]; 
-                 
-        wheels.home.upp_left.x    = -0.5*params.boardLength;
-        wheels.home.upp_left.y    = params.boardHeight/2;
-
-        wheels.home.upp_right.x   = 0.5*params.boardLength;
-        wheels.home.upp_right.y   = params.boardHeight/2;
-
-        wheels.home.low_right.x   = 0.5*params.boardLength;
-        wheels.home.low_right.y   = -params.boardHeight/2;
-
-        wheels.home.low_left.x    = -0.5*params.boardLength;
-        wheels.home.low_left.y    = -params.boardHeight/2;
-                 
- wheels.home.corners = horzcat([wheels.home.upp_left.x; wheels.home.upp_left.y; 1],...
-                            [wheels.home.upp_right.x; wheels.home.upp_right.y; 1],...
-                            [wheels.home.low_right.x; wheels.home.low_right.y; 1],...
-                            [wheels.home.low_left.x;  wheels.home.low_left.y; 1]);
-                        
-       
-
-wheels.curr.corners = T_wheels*wheels.home.corners;
-wheels.curr.corners(2,:) = wheels.curr.corners(2,:) + params.wheelRadius;
-
-
-     
-        p5 = line([wheels.curr.corners(1,4) wheels.curr.corners(1,4)],...
-             [wheels.curr.corners(2,4) (wheels.curr.corners(2,4) - 0.07*F(1))],...
-             'Color','k','LineWidth',4);
-         
-         p6 = line([wheels.curr.corners(1,3) wheels.curr.corners(1,3)],...
-             [wheels.curr.corners(2,3) (wheels.curr.corners(2,3) - 0.07*F(2))],...
-             'Color','k','LineWidth',4);
-       % line(yLeft,'Color','y','LineWidth',10)
-               hold off;
-               
-      legend([p1 p2 p3 p4 p5 p6], 'board CoM', 'bottom Link CoM', 'top link CoM',...
-      'aggregate CoM', 'left constraint', 'right constraint', ...
-       'Location', 'southeast', 'FontSize',10);  
-        end
+%         if p.Results.show_constraint_forces
+%                 
+%         T_wheels =   [cos(q(3)), -sin(q(3)), q(1);
+%                      sin(q(3)),  cos(q(3)), q(2);
+%                      0,          0,         1]; 
+%                  
+%         wheels.home.upp_left.x    = -0.5*params.boardLength;
+%         wheels.home.upp_left.y    = params.boardHeight/2;
+% 
+%         wheels.home.upp_right.x   = 0.5*params.boardLength;
+%         wheels.home.upp_right.y   = params.boardHeight/2;
+% 
+%         wheels.home.low_right.x   = 0.5*params.boardLength;
+%         wheels.home.low_right.y   = -params.boardHeight/2;
+% 
+%         wheels.home.low_left.x    = -0.5*params.boardLength;
+%         wheels.home.low_left.y    = -params.boardHeight/2;
+%                  
+%  wheels.home.corners = horzcat([wheels.home.upp_left.x; wheels.home.upp_left.y; 1],...
+%                             [wheels.home.upp_right.x; wheels.home.upp_right.y; 1],...
+%                             [wheels.home.low_right.x; wheels.home.low_right.y; 1],...
+%                             [wheels.home.low_left.x;  wheels.home.low_left.y; 1]);
+%                         
+%        
+% 
+% wheels.curr.corners = T_wheels*wheels.home.corners;
+% wheels.curr.corners(2,:) = wheels.curr.corners(2,:) + params.wheelRadius;
+% 
+% 
+%      
+%         p5 = line([wheels.curr.corners(1,4) wheels.curr.corners(1,4)],...
+%              [wheels.curr.corners(2,4) (wheels.curr.corners(2,4) - 0.07*F(1))],...
+%              'Color','k','LineWidth',4);
+%          
+%          p6 = line([wheels.curr.corners(1,3) wheels.curr.corners(1,3)],...
+%              [wheels.curr.corners(2,3) (wheels.curr.corners(2,3) - 0.07*F(2))],...
+%              'Color','k','LineWidth',4);
+%        % line(yLeft,'Color','y','LineWidth',10)
+%                hold off;
+%                
+%       legend([p1 p2 p3 p4 p5 p6], 'board CoM', 'bottom Link CoM', 'top link CoM',...
+%       'aggregate CoM', 'left constraint', 'right constraint', ...
+%        'Location', 'southeast', 'FontSize',10);  
+%         end
     
+%         hold on
         if p.Results.video 
+%             nFrames = size(q_list,2);
             M(i) = getframe;
             writeVideo(v,M(i));
         end

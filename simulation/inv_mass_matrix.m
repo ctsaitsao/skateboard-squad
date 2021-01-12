@@ -2,7 +2,7 @@
 %
 % Description:
 %   Wrapper function for autogen_inverse_mass_matrix.m
-%   Computes the inverse of the mass matrix of the robot.
+%   Computes the mass matrix of the jumping robot.
 %
 % Inputs:
 %   x: the state vector, x = [q; q_dot];
