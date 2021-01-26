@@ -19,7 +19,11 @@ Ramp:
 <img src="../media/ramp_constraints.png" width="500">
 
 ## Derivatives and Energy
-Calculating time derivatives of the kinematics equations of the robot is necessary for calculating the kinetic and potential energy for the robot. Energy conservation is a key part of simulating the dynamics and motion of the robot. See `derive_equations.mlx` for derivative and energy calculations.
+Calculating time derivatives of the kinematics equations of the robot is necessary for calculating the kinetic and potential energy for the robot. Energy conservation is a condition that must always be upholded in simulation calculations.
+
+Kinetic and potential energies are used to calculate the Lagrangian of the robot (equal to kinetic minus potential energy). The Lagrangian is in turn used to determine the Euler-Lagrange equations of the robot, which yield the generalized forces acting upon the system. These generalized forces are invaluable when simulating the system forward over time.
+
+See `derive_equations.mlx` for derivative and energy calculations.
 
 ## Trick Controls
 The robot contains two actuated degrees of freedom, `bottomLinkTheta` and `topLinkTheta`. This actuation comes from the two motors of the inverted double pendulum design. Thus, the two control variables are `bottomMotorTorque` and `topLinkTorque`. See the files `main.m`, `pid_idle.m`, `pid_pumping.m`, and `lqr_manual.m` for calculations.
