@@ -8,7 +8,7 @@ The robot is modeled using five degrees of freedom. The states vector `q` contai
 ## Stages and Constraints
 There are two stages that the simulated robot can exist in — flat and ramp. The drop-in and pumping tricks are performed in the ramp stage and the manual trick is performed in the flat stage.
 
-Each stage is accompanied by constraint equations, which are equations that constrain the robot's motion along the surface (ground) of each stage. For the flat surface, the constraints are unilateral in the Y direction. In the ramp, the constraints are be unilateral in the direction normal to the ramp. See `derive_equations.mlx` for equations.
+Each stage is accompanied by constraint equations, which are equations that constrain the robot's motion along the surface (ground) of each stage. For the flat surface, the constraints are unilateral in the Y direction. In the ramp, the constraints are unilateral in the direction normal to the ramp. See `derive_equations.mlx` for equations.
 
 Flat:
 
